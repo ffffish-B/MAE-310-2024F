@@ -135,6 +135,13 @@ for ee = 1 : n_el
 end
 
 
+for nn = 2:2:16   % element number
+    [xi, weight] = Gauss(nn-1, 0, 1);  % quadrature
+    for nnn = 1:nn-1
+        e_L2 = ()^(1/2)/(()^(1/2))
+        e_H1 = ()^(1/2)/(()^(1/2))
+end
+
 plot(x_sam, u_sam, '-r','LineWidth',3);
 hold on;
 plot(x_sam, y_sam, '-k','LineWidth',3);
