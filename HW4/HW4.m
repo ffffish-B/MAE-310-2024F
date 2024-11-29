@@ -8,13 +8,13 @@ h = 0.0;           % -u,x = h  at x = 0
 % Setup the mesh
 pp   = 1;              % polynomial degree 拟合阶数（map的段数）
 n_en = pp + 1;     % number of element or local nodes（map的节点数）
-e_L2 = [];
-e_H1 = [];        
+       
 for n_el = 2 : 2 : 16              % number of elements 单元数
     n_np = n_el * pp + 1;  % number of nodal points 节点数
     n_eq = n_np - 1;       % number of equations P Q
     n_int = 10;
 
+    
     hh = 1.0 / (n_np - 1); % space between two adjacent nodes 取等长单元h
     x_coor = 0 : hh : 1;   % nodal coordinates for equally spaced nodes
     
@@ -43,7 +43,8 @@ for n_el = 2 : 2 : 16              % number of elements 单元数
       f_ele = zeros(n_en, 1);    % allocate a zero element load vector
     
       x_ele = x_coor(IEN(ee,:)); % x_ele(aa) = x_coor(A) with A = IEN(aa, ee) % 局部节点X（ξ）
-    
+
+        
       % quadrature loop
       for qua = 1 : n_int       % map阶数
         dx_dxi = 0.0;           % dx/dξ
@@ -137,18 +138,14 @@ for n_el = 2 : 2 : 16              % number of elements 单元数
     end
     
 
-    for nnn = 1 : n_el
-        e_H1(nnn) = 0;
-        e_L2(nnn) = 0;
-        for qua = 1 : n_int
-            polyshape = 0;
-            for aa = 1 : n_en
-                polyshape = polyshape + PolyShape(pp, aa, xi(qua), 0);
-            end
-            e_L2(nnn) = e_L2(nnn) + weight(qua) * polyshape;
-        end
-
+    e_L2 = zeros(n_el);
+    e_H1 = zeros(n_el);
+    for nn = 1 : n_el
+        [xi, weight] = Gauss(n_int, x_coor(IEN(nn, 1)), x_coor(IEN(nn,1+pp)));
+        
     end
+
+
 
 end
 
