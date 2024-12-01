@@ -15,7 +15,7 @@ for n_el = 2 : 2 : 16           % number of elements 单元数
     n_ele = [n_ele, n_el];
     n_np = n_el * pp + 1;  % number of nodal points 节点数
     n_eq = n_np - 1;       % number of equations P Q
-    n_int = 10;
+    n_int = 1;
 
 
     hh = 1.0 / (n_np - 1); % space between two adjacent nodes 取等长单元h
@@ -179,8 +179,8 @@ for n_el = 2 : 2 : 16           % number of elements 单元数
     end
     eL2 = (eL2 / eL2_under)^(1/2);
     eH1 = (eH1 / eH1_under)^(1/2);
-    eL2_final = [eL2_final, eL2];
-    eH1_final = [eH1_final, eH1];
+    eL2_final = [eL2_final; eL2];
+    eH1_final = [eH1_final; eH1];
 end
 
 plot(log(n_ele.^-1), log(eL2_final), '-o','DisplayName','eL2');
