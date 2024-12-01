@@ -6,7 +6,7 @@ g = 1.0;           % u    = g  at x = 1
 h = 0.0;           % -u,x = h  at x = 0
 
 % Setup the mesh
-pp   = 1;              % polynomial degree 拟合阶数（map的段数）
+pp   = 3;              % polynomial degree 拟合阶数（map的段数）
 n_en = pp + 1;     % number of element or local nodes（map的节点数）
 eL2_final = [];
 eH1_final = [];
@@ -156,9 +156,14 @@ for n_el = 2 : 2 : 16           % number of elements 单元数
         for nnn = 1 : n_int
             polyshapeL2 = 0; % 要的在积分点上的uh
             polyshapeH1 = 0;
+            dx_dxi = 0.0;
+            for aa = 1 : n_en
+                dx_dxi = dx_dxi + x_ele(aa) * PolyShape(pp, aa, xi(nnn), 1); % Σxae Na,x (ξ)用高斯积分来积dx/dξ
+            end
+            dxi_dx = 1.0 / dx_dxi;
             for aa = 1 : n_en
                 polyshapeL2 = polyshapeL2 + u_ele(aa) * PolyShape(pp, aa, xi(nnn), 0); % 把每个形函数放缩后都加起来
-                polyshapeH1 = polyshapeH1 + u_ele(aa) * PolyShape(pp, aa, xi(nnn), 1);
+                polyshapeH1 = polyshapeH1 + u_ele(aa) * PolyShape(pp, aa, xi(nnn), 1) * dxi_dx;
             end
             e_L2(nn) = e_L2(nn) + weight2(nnn) * ( polyshapeL2 - xi2(nnn) ^ 5 )^2;
             e_H1(nn) = e_H1(nn) + weight2(nnn) * ( polyshapeH1 - 5 * xi2(nnn) ^ 4 )^2;
@@ -178,9 +183,17 @@ for n_el = 2 : 2 : 16           % number of elements 单元数
     eH1_final = [eH1_final, eH1];
 end
 
-plot(log(n_ele), log(eL2_final), '-r','LineWidth',3)
+plot(log(n_ele.^-1), log(eL2_final), '-o','DisplayName','eL2');
 hold on
-plot(log(n_ele), log(eH1_final), '-k','LineWidth',3)
+grid on
+plot(log(n_ele.^-1), log(eH1_final), '-x','DisplayName','eH1');
+xlabel('logh');
+ylabel('logerror');
+legend;
+niheL2 = polyfit ( log(n_ele.^-1), log(eL2_final), 1);%多项式拟合求斜率
+slopeL2 = niheL2(1);
+niheH1 = polyfit ( log(n_ele.^-1), log(eH1_final), 1);
+slopeH1 = niheH1(1);
 
 % plot(x_sam, u_sam, '-r','LineWidth',3);
 % hold on;
