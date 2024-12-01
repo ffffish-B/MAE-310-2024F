@@ -1,4 +1,4 @@
-clear all; clc; clf; % clean the memory, screen, and figure
+clear; clc; clf; % clean the memory, screen, and figure
 
 % Problem definition
 f = @(x) -20*x.^3; % f(x) is the source
@@ -9,7 +9,10 @@ h = 0.0;           % -u,x = h  at x = 0
 pp   = 1;              % polynomial degree 拟合阶数（map的段数）
 n_en = pp + 1;     % number of element or local nodes（map的节点数）
 eL2_final = [];
-for n_el = 2 : 2 : 16;            % number of elements 单元数
+eH1_final = [];
+n_ele = [];
+for n_el = 2 : 2 : 16           % number of elements 单元数
+    n_ele = [n_ele, n_el];
     n_np = n_el * pp + 1;  % number of nodal points 节点数
     n_eq = n_np - 1;       % number of equations P Q
     n_int = 10;
@@ -144,30 +147,40 @@ for n_el = 2 : 2 : 16;            % number of elements 单元数
     eL2 = 0;
     eL2_under = 0;% 分母
     eH1 = 0;
+    eH1_under = 0;
     for nn = 1 : n_el
         x_ele = x_coor( IEN(nn, :) );
         u_ele = disp( IEN(nn, :) );
         [xi2, weight2] = Gauss(n_int, x_coor(IEN(nn, 1)), x_coor(IEN(nn,1+pp)));%在he区间内的高斯积分
 
         for nnn = 1 : n_int
-            polyshape = 0; % 要的在积分点上的uh
+            polyshapeL2 = 0; % 要的在积分点上的uh
+            polyshapeH1 = 0;
             for aa = 1 : n_en
-                polyshape = polyshape + u_ele(aa) * PolyShape(pp, aa, xi(nnn), 0); % 把每个形函数放缩后都加起来
+                polyshapeL2 = polyshapeL2 + u_ele(aa) * PolyShape(pp, aa, xi(nnn), 0); % 把每个形函数放缩后都加起来
+                polyshapeH1 = polyshapeH1 + u_ele(aa) * PolyShape(pp, aa, xi(nnn), 1);
             end
-            e_L2(nn) = e_L2(nn) + weight2(nnn) * ( polyshape - xi2(nnn) ^ 5 )^2;
+            e_L2(nn) = e_L2(nn) + weight2(nnn) * ( polyshapeL2 - xi2(nnn) ^ 5 )^2;
+            e_H1(nn) = e_H1(nn) + weight2(nnn) * ( polyshapeH1 - 5 * xi2(nnn) ^ 4 )^2;
 
         end
         eL2 = eL2 + e_L2(nn);
+        eH1 = eH1 + e_H1(nn);
     end
 
     for nnn = 1 : n_int
         eL2_under = eL2_under + weight1(nnn) * ((xi1(nnn) ^ 5) ^2);
+        eH1_under = eH1_under + weight1(nnn) * ((5 * xi1(nnn) ^ 4) ^2);
     end
     eL2 = (eL2 / eL2_under)^(1/2);
+    eH1 = (eH1 / eH1_under)^(1/2);
     eL2_final = [eL2_final, eL2];
+    eH1_final = [eH1_final, eH1];
 end
 
-
+plot(log(n_ele), log(eL2_final), '-r','LineWidth',3)
+hold on
+plot(log(n_ele), log(eH1_final), '-k','LineWidth',3)
 
 % plot(x_sam, u_sam, '-r','LineWidth',3);
 % hold on;
