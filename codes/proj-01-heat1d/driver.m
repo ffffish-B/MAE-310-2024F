@@ -8,7 +8,7 @@ h = 0.0;           % -u,x = h  at x = 0
 % Setup the mesh
 pp   = 3;              % polynomial degree 拟合阶数（map的段数）
 n_en = pp + 1;         % number of element or local nodes（map的节点数）
-n_el = 2;              % number of elements 单元数
+n_el = 5;              % number of elements 单元数
 n_np = n_el * pp + 1;  % number of nodal points 节点数
 n_eq = n_np - 1;       % number of equations P Q
 n_int = 2;
@@ -85,7 +85,6 @@ end
 
 % ee = 1 F = NA(0)xh
 F(ID(IEN(1,1))) = F(ID(IEN(1,1))) + h;
-K
 % Solve Kd = F equation
 d_temp = K \ F;
 
