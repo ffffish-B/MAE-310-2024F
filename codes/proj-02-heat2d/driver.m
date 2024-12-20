@@ -52,6 +52,9 @@ for ex = 1 : n_el_x
   end
 end
 
+% 上边所有的都在建立IEN数组
+% 建立ID数组，让边界的P=0
+
 % ID array
 ID = zeros(n_np,1);
 counter = 0;
@@ -66,24 +69,24 @@ end
 n_eq = counter;
 
 LM = ID(IEN);
-
+% 打开K和F的空矩阵
 % allocate the stiffness matrix and load vector
 K = spalloc(n_eq, n_eq, 9 * n_eq);
 F = zeros(n_eq, 1);
 
 % loop over element to assembly the matrix and vector
-for ee = 1 : n_el
+for ee = 1 : n_el %所有的节点循环，，建立ele
   x_ele = x_coor( IEN(ee, 1:n_en) );
   y_ele = y_coor( IEN(ee, 1:n_en) );
   
   k_ele = zeros(n_en, n_en); % element stiffness matrix
   f_ele = zeros(n_en, 1);    % element load vector
   
-  for ll = 1 : n_int
+  for ll = 1 : n_int %2D高斯点循环
     x_l = 0.0; y_l = 0.0;
     dx_dxi = 0.0; dx_deta = 0.0;
     dy_dxi = 0.0; dy_deta = 0.0;
-    for aa = 1 : n_en
+    for aa = 1 : n_en %在map中用雅各比矩阵换元
       x_l = x_l + x_ele(aa) * Quad(aa, xi(ll), eta(ll));
       y_l = y_l + y_ele(aa) * Quad(aa, xi(ll), eta(ll));    
       [Na_xi, Na_eta] = Quad_grad(aa, xi(ll), eta(ll));
@@ -95,7 +98,7 @@ for ee = 1 : n_el
     
     detJ = dx_dxi * dy_deta - dx_deta * dy_dxi;
     
-    for aa = 1 : n_en
+    for aa = 1 : n_en %用雅各比矩阵进行高斯积分-Na
       Na = Quad(aa, xi(ll), eta(ll));
       [Na_xi, Na_eta] = Quad_grad(aa, xi(ll), eta(ll));
       Na_x = (Na_xi * dy_deta - Na_eta * dy_dxi) / detJ;
@@ -103,7 +106,7 @@ for ee = 1 : n_el
       
       f_ele(aa) = f_ele(aa) + weight(ll) * detJ * f(x_l, y_l) * Na;
       
-      for bb = 1 : n_en
+      for bb = 1 : n_en %''-Nb
         Nb = Quad(bb, xi(ll), eta(ll));
         [Nb_xi, Nb_eta] = Quad_grad(bb, xi(ll), eta(ll));
         Nb_x = (Nb_xi * dy_deta - Nb_eta * dy_dxi) / detJ;
@@ -113,7 +116,8 @@ for ee = 1 : n_el
       end % end of bb loop
     end % end of aa loop
   end % end of quadrature loop
- 
+ %结束单元内的组装
+ %找P,Q进行整个大刚度阵的组装
   for aa = 1 : n_en
     PP = LM(ee, aa);
     if PP > 0
@@ -144,6 +148,7 @@ for ii = 1 : n_np
   if index > 0
     disp(ii) = dn(index);
   else
+      %作业这里要改成非零的g
     % modify disp with the g data. Here it does nothing because g is zero
   end
 end
