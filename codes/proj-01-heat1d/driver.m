@@ -11,7 +11,7 @@ n_en = pp + 1;         % number of element or local nodes（map的节点数）
 n_el = 5;              % number of elements 单元数
 n_np = n_el * pp + 1;  % number of nodal points 节点数
 n_eq = n_np - 1;       % number of equations P Q
-n_int = 2;
+n_int = 10;
 
 hh = 1.0 / (n_np - 1); % space between two adjacent nodes 取等长单元h
 x_coor = 0 : hh : 1;   % nodal coordinates for equally spaced nodes

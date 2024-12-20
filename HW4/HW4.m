@@ -6,7 +6,7 @@ g = 1.0;           % u    = g  at x = 1
 h = 0.0;           % -u,x = h  at x = 0
 
 % Setup the mesh
-pp   = 3;              % polynomial degree 拟合阶数（map的段数）
+pp   = 2;              % polynomial degree 拟合阶数（map的段数）
 n_en = pp + 1;     % number of element or local nodes（map的节点数）
 eL2_final = [];
 eH1_final = [];
@@ -15,7 +15,7 @@ for n_el = 2 : 2 : 16           % number of elements 单元数
     n_ele = [n_ele, n_el];
     n_np = n_el * pp + 1;  % number of nodal points 节点数
     n_eq = n_np - 1;       % number of equations P Q
-    n_int = 1;
+    n_int = 10;
 
 
     hh = 1.0 / (n_np - 1); % space between two adjacent nodes 取等长单元h
