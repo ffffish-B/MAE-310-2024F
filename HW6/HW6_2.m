@@ -207,7 +207,46 @@ for n_el_x = [10, 20, 40, 80] % 网格密度
             error_H1 = error_H1 + weight(ll) * detJ * (ex^2 + ey^2);
         end
     end
-    
+        error_L2 = sqrt(error_L2);
+    error_H1 = sqrt(error_H1);
+
+    errors_L2 = [errors_L2, error_L2];
+    errors_H1 = [errors_H1, error_H1];
+    mesh_sizes = [mesh_sizes, h];
+    % save the solution vector and number of elements to disp with name
+    % HEAT.mat
+    % save("HEAT", "disp", "n_el_x", "n_el_y");
+end
+
+
+figure;
+loglog(mesh_sizes, errors_L2, '-o', 'DisplayName', 'L2 Norm');
+hold on;
+loglog(mesh_sizes, errors_H1, '-o', 'DisplayName', 'H1 Norm');
+
+% Linear fit to find slopes
+log_h = log(mesh_sizes);
+log_L2 = log(errors_L2);
+log_H1 = log(errors_H1);
+
+coeff_L2 = polyfit(log_h, log_L2, 1);
+coeff_H1 = polyfit(log_h, log_H1, 1);
+
+slope_L2 = coeff_L2(1);
+slope_H1 = coeff_H1(1);
+
+% Add fitted lines
+fit_L2 = exp(polyval(coeff_L2, log_h));
+fit_H1 = exp(polyval(coeff_H1, log_h));
+
+loglog(mesh_sizes, fit_L2, '--', 'DisplayName', sprintf('L2 Fit (Slope: %.2f)', slope_L2));
+loglog(mesh_sizes, fit_H1, '--', 'DisplayName', sprintf('H1 Fit (Slope: %.2f)', slope_H1));
+
+xlabel('Mesh Size (h)');
+ylabel('Error');
+legend;
+grid on;
+title('Error Convergence and Fitted Slopes');
 
 
 
