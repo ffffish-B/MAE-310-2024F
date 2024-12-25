@@ -19,7 +19,7 @@ n_int     = n_int_xi * n_int_eta;
 n_en   = 3;               % number of nodes in an element
 n_el_x = 60;               % number of elements in x-dir
 n_el_y = 60;               % number of elements in y-dir
-n_el   = n_el_x * n_el_y; % total number of elements
+n_el   = 2 * n_el_x * n_el_y; % total number of elements
 
 n_np_x = n_el_x + 1;      % number of nodal points in x-dir
 n_np_y = n_el_y + 1;      % number of nodal points in y-dir
@@ -41,22 +41,17 @@ for ny = 1 : n_np_y
 end
 
 % IEN array
-IEN = zeros(n_el, n_en);
-IEN_tri = zeros(2 * n_el, 3); % 两倍的单元数，每个单元三个节点
+IEN_tri = zeros(n_el, 3); % 两倍的单元数，每个单元三个节点
 for ex = 1 : n_el_x
     for ey = 1 : n_el_y
         ee = (ey-1) * n_el_x + ex; % element index
 
-        IEN(ee, 1) = (ey-1) * n_np_x + ex;
-        IEN(ee, 2) = (ey-1) * n_np_x + ex + 1;
-        IEN(ee, 3) =  ey    * n_np_x + ex + 1;
-        IEN(ee, 4) =  ey    * n_np_x + ex;
-        IEN_tri(2*ee-1, 1) = IEN(ee, 1);
-        IEN_tri(2*ee-1, 2) = IEN(ee, 2);
-        IEN_tri(2*ee-1, 3) = IEN(ee, 4);
-        IEN_tri(2*ee, 1) = IEN(ee, 3);
-        IEN_tri(2*ee, 2) = IEN(ee, 4);
-        IEN_tri(2*ee, 3) = IEN(ee, 2);
+        IEN_tri(2*ee-1, 1) = (ey-1) * n_np_x + ex;
+        IEN_tri(2*ee-1, 2) = (ey-1) * n_np_x + ex + 1;
+        IEN_tri(2*ee-1, 3) = ey    * n_np_x + ex;
+        IEN_tri(2*ee, 1) = ey    * n_np_x + ex + 1;
+        IEN_tri(2*ee, 2) = ey    * n_np_x + ex;
+        IEN_tri(2*ee, 3) = (ey-1) * n_np_x + ex + 1;
     end
 end
 
@@ -77,7 +72,7 @@ end
 
 n_eq = counter;
 
-LM = ID(IEN);
+LM = ID(IEN_tri);
 % 打开K和F的空矩阵
 % allocate the stiffness matrix and load vector
 K = spalloc(n_eq, n_eq, 9 * n_eq);
@@ -85,8 +80,8 @@ F = zeros(n_eq, 1);
 
 % loop over element to assembly the matrix and vector
 for ee = 1 : n_el %所有的节点循环，，建立ele
-  x_ele = x_coor( IEN(ee, 1:n_en) );
-  y_ele = y_coor( IEN(ee, 1:n_en) );
+  x_ele = x_coor( IEN_tri(ee, 1:n_en) );
+  y_ele = y_coor( IEN_tri(ee, 1:n_en) );
   
   k_ele = zeros(n_en, n_en); % element stiffness matrix
   f_ele = zeros(n_en, 1);    % element load vector

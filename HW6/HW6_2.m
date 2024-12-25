@@ -15,16 +15,14 @@ n_int_eta = 3;
 n_int     = n_int_xi * n_int_eta;
 [xi, eta, weight] = Gauss2D(n_int_xi, n_int_eta);
 
-%初始化error
 errors_L2 = [];
 errors_H1 = [];
 mesh_sizes = [];
-
 % mesh generation
-for n_el_x = [10, 20, 40, 80]
+for n_el_x = [10, 20, 40, 80] % 网格密度
     n_en   = 3;               % number of nodes in an element
-    n_el_y = n_el_x;               % number of elements in y-dir
-    n_el   = n_el_x * n_el_y; % total number of elements
+    n_el_y = n_el_x;               % number of elements in xy-dir
+    n_el   = 2 * n_el_x * n_el_y; % total number of elements
 
     n_np_x = n_el_x + 1;      % number of nodal points in x-dir
     n_np_y = n_el_y + 1;      % number of nodal points in y-dir
@@ -35,7 +33,7 @@ for n_el_x = [10, 20, 40, 80]
 
     hx = 1.0 / n_el_x;        % mesh size in x-dir
     hy = 1.0 / n_el_y;        % mesh size in y-dir
-
+    h = max(hx ,hy);
     % generate the nodal coordinates
     for ny = 1 : n_np_y
         for nx = 1 : n_np_x
@@ -46,22 +44,17 @@ for n_el_x = [10, 20, 40, 80]
     end
 
     % IEN array
-    IEN = zeros(n_el, n_en);
-    IEN_tri = zeros(2 * n_el, 3); % 两倍的单元数，每个单元三个节点
+    IEN_tri = zeros(n_el, n_en); % 两倍的单元数，每个单元三个节点
     for ex = 1 : n_el_x
         for ey = 1 : n_el_y
             ee = (ey-1) * n_el_x + ex; % element index
 
-            IEN(ee, 1) = (ey-1) * n_np_x + ex;
-            IEN(ee, 2) = (ey-1) * n_np_x + ex + 1;
-            IEN(ee, 3) =  ey    * n_np_x + ex + 1;
-            IEN(ee, 4) =  ey    * n_np_x + ex;
-            IEN_tri(2*ee-1, 1) = IEN(ee, 1);
-            IEN_tri(2*ee-1, 2) = IEN(ee, 2);
-            IEN_tri(2*ee-1, 3) = IEN(ee, 4);
-            IEN_tri(2*ee, 1) = IEN(ee, 3);
-            IEN_tri(2*ee, 2) = IEN(ee, 4);
-            IEN_tri(2*ee, 3) = IEN(ee, 2);
+            IEN_tri(2*ee-1, 1) = (ey-1) * n_np_x + ex;
+            IEN_tri(2*ee-1, 2) = (ey-1) * n_np_x + ex + 1;
+            IEN_tri(2*ee-1, 3) = ey    * n_np_x + ex;
+            IEN_tri(2*ee, 1) = ey    * n_np_x + ex + 1;
+            IEN_tri(2*ee, 2) = ey    * n_np_x + ex;
+            IEN_tri(2*ee, 3) = (ey-1) * n_np_x + ex + 1;
         end
     end
 
@@ -82,7 +75,7 @@ for n_el_x = [10, 20, 40, 80]
 
     n_eq = counter;
 
-    LM = ID(IEN);
+    LM = ID(IEN_tri);
     % 打开K和F的空矩阵
     % allocate the stiffness matrix and load vector
     K = spalloc(n_eq, n_eq, 9 * n_eq);
@@ -90,8 +83,8 @@ for n_el_x = [10, 20, 40, 80]
 
     % loop over element to assembly the matrix and vector
     for ee = 1 : n_el %所有的节点循环，，建立ele
-        x_ele = x_coor( IEN(ee, 1:n_en) );
-        y_ele = y_coor( IEN(ee, 1:n_en) );
+        x_ele = x_coor( IEN_tri(ee, 1:n_en) );
+        y_ele = y_coor( IEN_tri(ee, 1:n_en) );
 
         k_ele = zeros(n_en, n_en); % element stiffness matrix
         f_ele = zeros(n_en, 1);    % element load vector
@@ -166,16 +159,12 @@ for n_el_x = [10, 20, 40, 80]
             % modify disp with the g data. Here it does nothing because g is zero
         end
     end
-end
-% save the solution vector and number of elements to disp with name
-% HEAT.mat
-save("HEAT", "disp", "n_el_x", "n_el_y");
 
-plot3(x_coor,y_coor,disp)
+    %error
+    error_L2 = 0;
+    error_H1 = 0;
 
-
-
-
+    
 
 
 
