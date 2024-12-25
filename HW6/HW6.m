@@ -96,9 +96,9 @@ for ee = 1 : n_el %所有的节点循环，，建立ele
     dx_dxi = 0.0; dx_deta = 0.0;
     dy_dxi = 0.0; dy_deta = 0.0;
     for aa = 1 : n_en %在map中用雅各比矩阵换元
-      x_l = x_l + x_ele(aa) * TriShapeFunction(aa, xi(ll), eta(ll));
-      y_l = y_l + y_ele(aa) * TriShapeFunction(aa, xi(ll), eta(ll));    
-      [Na_xi, Na_eta] = TriShapeFunction_Grad(aa, xi(ll), eta(ll));
+      x_l = x_l + x_ele(aa) * Tri(aa, xi(ll), eta(ll));
+      y_l = y_l + y_ele(aa) * Tri(aa, xi(ll), eta(ll));    
+      [Na_xi, Na_eta] = Tri_grad(aa, xi(ll), eta(ll));
       dx_dxi  = dx_dxi  + x_ele(aa) * Na_xi;
       dx_deta = dx_deta + x_ele(aa) * Na_eta;
       dy_dxi  = dy_dxi  + y_ele(aa) * Na_xi;
@@ -108,16 +108,16 @@ for ee = 1 : n_el %所有的节点循环，，建立ele
     detJ = dx_dxi * dy_deta - dx_deta * dy_dxi;
     
     for aa = 1 : n_en %用雅各比矩阵进行高斯积分-Na
-      Na = TriShapeFunction(aa, xi(ll), eta(ll));
-      [Na_xi, Na_eta] = TriShapeFunction_Grad(aa, xi(ll), eta(ll));
+      Na = Tri(aa, xi(ll), eta(ll));
+      [Na_xi, Na_eta] = Tri_grad(aa, xi(ll), eta(ll));
       Na_x = (Na_xi * dy_deta - Na_eta * dy_dxi) / detJ;
       Na_y = (-Na_xi * dx_deta + Na_eta * dx_dxi) / detJ;
       
       f_ele(aa) = f_ele(aa) + weight(ll) * detJ * f(x_l, y_l) * Na;
       
       for bb = 1 : n_en %''-Nb
-        Nb = TriShapeFunction(bb, xi(ll), eta(ll));
-        [Nb_xi, Nb_eta] = TriShapeFunction_Grad(bb, xi(ll), eta(ll));
+        Nb = Tri(bb, xi(ll), eta(ll));
+        [Nb_xi, Nb_eta] = Tri_grad(bb, xi(ll), eta(ll));
         Nb_x = (Nb_xi * dy_deta - Nb_eta * dy_dxi) / detJ;
         Nb_y = (-Nb_xi * dx_deta + Nb_eta * dx_dxi) / detJ;
         
@@ -167,4 +167,15 @@ end
 save("HEAT", "disp", "n_el_x", "n_el_y");
 
 plot3(x_coor,y_coor,disp)
+
+
+
+
+
+
+
+
+
+
+
 % EOF
