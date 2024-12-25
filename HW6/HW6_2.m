@@ -164,6 +164,49 @@ for n_el_x = [10, 20, 40, 80] % 网格密度
     error_L2 = 0;
     error_H1 = 0;
 
+    for ee = 1:n_el
+        x_ele = x_coor( IEN_tri(ee, 1:n_en) );
+        y_ele = y_coor( IEN_tri(ee, 1:n_en) );
+        u_h = disp(IEN_tri(ee, 1:n_en));
+
+        for ll = 1 : n_int
+            x_l = 0.0; y_l = 0.0; dx_dxi = 0.0; dx_deta = 0.0;
+            dy_dxi = 0.0; dy_deta = 0.0;
+            for aa = 1 : n_en
+                x_l = x_l + x_ele(aa) * Tri(aa, xi(ll), eta(ll));
+                y_l = y_l + y_ele(aa) * Tri(aa, xi(ll), eta(ll));    
+                [Na_xi, Na_eta] = Tri_grad(aa, xi(ll), eta(ll));
+                dx_dxi  = dx_dxi  + x_ele(aa) * Na_xi;
+                dx_deta = dx_deta + x_ele(aa) * Na_eta;
+                dy_dxi  = dy_dxi  + y_ele(aa) * Na_xi;
+                dy_deta = dy_deta + y_ele(aa) * Na_eta;
+            end
+
+            detJ = dx_dxi * dy_deta - dx_deta * dy_dxi;
+
+            u_exact = exact(x_l, y_l);
+            ux_exact = exact_x(x_l, y_l);
+            uy_exact = exact_y(x_l, y_l);
+
+            uh = 0.0; uh_x = 0.0; uh_y = 0.0;
+            for aa = 1:n_en
+                Na = Tri(aa, xi(ll), eta(ll));
+                [Na_xi, Na_eta] =Tri_grad(aa, xi(ll), eta(ll));
+                Na_x = (Na_xi * dy_deta - Na_eta * dy_dxi) / detJ;
+                Na_y = (-Na_xi * dx_deta + Na_eta * dx_dxi) / detJ;
+                uh = uh + u_h(aa) * Na;
+                uh_x = uh_x + u_h(aa) * Na_x;
+                uh_y = uh_y + u_h(aa) * Na_y;
+            end
+
+            e = uh - u_exact;
+            ex = uh_x - ux_exact;
+            ey = uh_y - uy_exact;
+
+            error_L2 = error_L2 + weight(ll) * detJ * e^2;
+            error_H1 = error_H1 + weight(ll) * detJ * (ex^2 + ey^2);
+        end
+    end
     
 
 
