@@ -28,7 +28,7 @@ Transfinite Line{1, 2, 3, 4, 5, 6, 7} = 3;
 对两个平面进行网格划分
 Transfinite Surface{1};
 Transfinite Surface{2};
-优化网格质量
+将三角形网格合并成四边形网格
 Recombine Surface{1};
 Recombine Surface{2};
 用线性单元，网格生成算法为8

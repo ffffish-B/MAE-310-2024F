@@ -13,7 +13,7 @@ f = @(x,y) 2.0*kappa*x*(1-x) + 2.0*kappa*y*(1-y); % source term
 n_int_xi  = 3;
 n_int_eta = 3;
 n_int     = n_int_xi * n_int_eta;
-[xi, eta, weight] = Gauss2D(n_int_xi, n_int_eta);
+[xi, eta, weight] = Gauss2D_Tri(n_int_xi, n_int_eta);
 
 % mesh generation
 n_en   = 3;               % number of nodes in an element
