@@ -1,188 +1,155 @@
-clear all; clc; clf; % clean the memory, screen, and figure
+clear all; clc;
 
-% Problem definition
-f = @(x) -20*x.^3; % f(x) is the source
-g = 1.0;           % u    = g  at x = 1
-h = 0.0;           % -u,x = h  at x = 0
+kappa = 1.0; % conductivity
 
-exact = @(x) x.^5;
-exact_x = @(x) 5 * x.^4;
+% exact solution
+exact = @(x,y) x*(1-x)*y*(1-y);
+exact_x = @(x,y) (1-2*x)*y*(1-y);
+exact_y = @(x,y) x*(1-x)*(1-2*y);
 
-% Setup the mesh
-<<<<<<< HEAD
-pp   = 3;              % polynomial degree 拟合阶数（map的段数）
-n_en = pp + 1;         % number of element or local nodes（map的节点数）
-n_el = 5;              % number of elements 单元数
-n_np = n_el * pp + 1;  % number of nodal points 节点数
-n_eq = n_np - 1;       % number of equations P Q
-=======
-pp   = 2;              % polynomial degree
-n_en = pp + 1;         % number of element or local nodes
-n_el = 16;              % number of elements
-n_np = n_el * pp + 1;  % number of nodal points
-n_eq = n_np - 1;       % number of equations
->>>>>>> 9716d7364d9e0bf5bc3000b5cfcb8cecd2135804
-n_int = 10;
+f = @(x,y) 2.0*kappa*x*(1-x) + 2.0*kappa*y*(1-y); % source term
 
-hh = 1.0 / (n_np - 1); % space between two adjacent nodes 取等长单元h
-x_coor = 0 : hh : 1;   % nodal coordinates for equally spaced nodes
+% quadrature rule
+n_int_xi  = 3;
+n_int_eta = 3;
+n_int     = n_int_xi * n_int_eta;
+[xi, eta, weight] = Gauss2D(n_int_xi, n_int_eta);
 
-IEN = zeros(n_el, n_en);
+% mesh generation
+n_en   = 4;               % number of nodes in an element
+n_el_x = 60;               % number of elements in x-dir
+n_el_y = 60;               % number of elements in y-dir
+n_el   = n_el_x * n_el_y; % total number of elements
 
-for ee = 1 : n_el      % 单元数
-  for aa = 1 : n_en    % local节点数
-    IEN(ee, aa) = (ee - 1) * pp + aa;
+n_np_x = n_el_x + 1;      % number of nodal points in x-dir
+n_np_y = n_el_y + 1;      % number of nodal points in y-dir
+n_np   = n_np_x * n_np_y; % total number of nodal points
+
+x_coor = zeros(n_np, 1);
+y_coor = x_coor;
+
+hx = 1.0 / n_el_x;        % mesh size in x-dir
+hy = 1.0 / n_el_y;        % mesh size in y-dir
+
+% generate the nodal coordinates
+for ny = 1 : n_np_y
+  for nx = 1 : n_np_x
+    index = (ny-1)*n_np_x + nx; % nodal index
+    x_coor(index) = (nx-1) * hx;
+    y_coor(index) = (ny-1) * hy;
   end
 end
 
-% Setup the ID array for the problem
-ID = 1 : n_np;
-ID(end) = 0;
+% IEN array
+IEN = zeros(n_el, n_en);
+for ex = 1 : n_el_x
+  for ey = 1 : n_el_y
+    ee = (ey-1) * n_el_x + ex; % element index
+    IEN(ee, 1) = (ey-1) * n_np_x + ex;
+    IEN(ee, 2) = (ey-1) * n_np_x + ex + 1;
+    IEN(ee, 3) =  ey    * n_np_x + ex + 1;
+    IEN(ee, 4) =  ey    * n_np_x + ex;
+  end
+end
 
-% Setup the quadrature rule
-[xi, weight] = Gauss(n_int, -1, 1);
+% ID array
+ID = zeros(n_np,1);
+counter = 0;
+for ny = 2 : n_np_y - 1
+  for nx = 2 : n_np_x - 1
+    index = (ny-1)*n_np_x + nx;
+    counter = counter + 1;
+    ID(index) = counter;  
+  end
+end
 
-% allocate the stiffness matrix
-K = spalloc(n_eq, n_eq, (2*pp+1)*n_eq);
+n_eq = counter;
+
+LM = ID(IEN);
+
+% allocate the stiffness matrix and load vector
+K = spalloc(n_eq, n_eq, 9 * n_eq);
 F = zeros(n_eq, 1);
 
-% Assembly of the stiffness matrix and load vector
-for ee = 1 : n_el   % 单元数
-  k_ele = zeros(n_en, n_en); % allocate a zero element stiffness matrix 建立Kab单元刚度阵
-  f_ele = zeros(n_en, 1);    % allocate a zero element load vector
-
-  x_ele = x_coor(IEN(ee,:)); % x_ele(aa) = x_coor(A) with A = IEN(aa, ee) % 局部节点X（ξ）
-
-  % quadrature loop
-  for qua = 1 : n_int       % map阶数
-    dx_dxi = 0.0;           % dx/dξ
-    x_l = 0.0;              % x(ξl)
-    for aa = 1 : n_en
-      x_l    = x_l    + x_ele(aa) * PolyShape(pp, aa, xi(qua), 0);
-      dx_dxi = dx_dxi + x_ele(aa) * PolyShape(pp, aa, xi(qua), 1); % Σxae Na,x (ξ)用高斯积分来积dx/dξ
-    end 
-    dxi_dx = 1.0 / dx_dxi;
-
-% 求局部系数矩阵Kab
-
-    for aa = 1 : n_en
-      f_ele(aa) = f_ele(aa) + weight(qua) * PolyShape(pp, aa, xi(qua), 0) * f(x_l) * dx_dxi;
-      for bb = 1 : n_en
-        k_ele(aa, bb) = k_ele(aa, bb) + weight(qua) * PolyShape(pp, aa, xi(qua), 1) * PolyShape(pp, bb, xi(qua), 1) * dxi_dx;
-      end
-    end
-  end
- 
-  % Assembly of the matrix and vector based on the ID or LM data
-  % check the ID(IEN(ee, aa)) and ID(IEN(ee, bb), if they are positive
-  % put the element stiffness matrix into K
-  % 把Kab往K里带
-
-  for aa = 1 : n_en
-    P = ID(IEN(ee,aa));
-    if(P > 0)
-      F(P) = F(P) + f_ele(aa);
-      for bb = 1 : n_en
-        Q = ID(IEN(ee,bb));
-        if(Q > 0)
-          K(P, Q) = K(P, Q) + k_ele(aa, bb);
-        else
-          F(P) = F(P) - k_ele(aa, bb) * g; % handles the Dirichlet boundary data
-        end
-      end
-    end
-  end
-end
-
-% ee = 1 F = NA(0)xh
-F(ID(IEN(1,1))) = F(ID(IEN(1,1))) + h;
-% Solve Kd = F equation
-d_temp = K \ F;
-
-disp = [d_temp; g];
-
-% 只取节点的画图
-% Postprocessing: visualization
-%plot(x_coor, disp, '--r','LineWidth',3);
-
-%x_sam = 0 : 0.01 : 1;
-%y_sam = x_sam.^5;
-%hold on;
-%plot(x_sam, y_sam, '-k', 'LineWidth', 3);
-
-% 为了求出节点中间的值（map是2次以上）更好的看出近似解的图像
-n_sam = 20; % map中元素数
-xi_sam = -1 : (2/n_sam) : 1; % ξa
-
-x_sam = zeros(n_el * n_sam + 1, 1); % 采样点
-y_sam = x_sam; % store the exact solution value at sampling points 储存采样点真实解
-u_sam = x_sam; % store the numerical solution value at sampling pts 储存采样点数值解
-
-for ee = 1 : n_el 
-  x_ele = x_coor( IEN(ee, :) ); % 节点坐标
-  u_ele = disp( IEN(ee, :) );   % 节点数值解
-
-  if ee == n_el
-    n_sam_end = n_sam+1;  % 就是局部节点数
-  else
-    n_sam_end = n_sam; % 其实是局部节点数-1
-  end
-
-  %采样点计算
-  
-  for ll = 1 : n_sam_end  
-    x_l = 0.0;
-    u_l = 0.0;
-    for aa = 1 : n_en
-      x_l = x_l + x_ele(aa) * PolyShape(pp, aa, xi_sam(ll), 0);
-      u_l = u_l + u_ele(aa) * PolyShape(pp, aa, xi_sam(ll), 0);
-    end
-
-    x_sam( (ee-1)*n_sam + ll ) = x_l;
-    u_sam( (ee-1)*n_sam + ll ) = u_l;
-    y_sam( (ee-1)*n_sam + ll ) = x_l^5;
-  end
-end
-
-
-plot(x_sam, u_sam, '-r','LineWidth',3);
-hold on;
-plot(x_sam, y_sam, '-k','LineWidth',3);
-
-
-% calculate the error
-nqp = 10;
-[xi, weight] = Gauss(nqp, -1, 1);
-
-L2_top = 0.0; L2_bot = 0.0; H1_top = 0.0; H1_bot = 0.0;
-
+% loop over element to assembly the matrix and vector
 for ee = 1 : n_el
-  x_ele = x_coor( IEN(ee, :) );
-  u_ele = disp( IEN(ee, :) );
-
-  for ll = 1 : nqp
-    x_l = 0.0; uh = 0.0; dx_dxi = 0.0; uh_xi = 0.0;
+  x_ele = x_coor( IEN(ee, 1:n_en) );
+  y_ele = y_coor( IEN(ee, 1:n_en) );
+  
+  k_ele = zeros(n_en, n_en); % element stiffness matrix
+  f_ele = zeros(n_en, 1);    % element load vector
+  
+  for ll = 1 : n_int
+    x_l = 0.0; y_l = 0.0;
+    dx_dxi = 0.0; dx_deta = 0.0;
+    dy_dxi = 0.0; dy_deta = 0.0;
     for aa = 1 : n_en
-      x_l    = x_l    + x_ele(aa) * PolyShape(pp, aa, xi(ll), 0);
-      uh     = uh     + u_ele(aa) * PolyShape(pp, aa, xi(ll), 0);
-      dx_dxi = dx_dxi + x_ele(aa) * PolyShape(pp, aa, xi(ll), 1);
-      uh_xi  = uh_xi  + u_ele(aa) * PolyShape(pp, aa, xi(ll), 1);
+      x_l = x_l + x_ele(aa) * Quad(aa, xi(ll), eta(ll));
+      y_l = y_l + y_ele(aa) * Quad(aa, xi(ll), eta(ll));    
+      [Na_xi, Na_eta] = Quad_grad(aa, xi(ll), eta(ll));
+      dx_dxi  = dx_dxi  + x_ele(aa) * Na_xi;
+      dx_deta = dx_deta + x_ele(aa) * Na_eta;
+      dy_dxi  = dy_dxi  + y_ele(aa) * Na_xi;
+      dy_deta = dy_deta + y_ele(aa) * Na_eta;
     end
-    dxi_dx = 1.0 / dx_dxi;
-
-    L2_top = L2_top + weight(ll) * (uh - exact(x_l))^2 * dx_dxi;
-    L2_bot = L2_bot + weight(ll) * exact(x_l)^2 * dx_dxi;
-
-    H1_top = H1_top + weight(ll) * ( uh_xi * dxi_dx - exact_x(x_l) )^2 * dx_dxi;
-    H1_bot = H1_bot + weight(ll) * exact_x(x_l)^2 * dx_dxi;
-
+    
+    detJ = dx_dxi * dy_deta - dx_deta * dy_dxi;
+    
+    for aa = 1 : n_en
+      Na = Quad(aa, xi(ll), eta(ll));
+      [Na_xi, Na_eta] = Quad_grad(aa, xi(ll), eta(ll));
+      Na_x = (Na_xi * dy_deta - Na_eta * dy_dxi) / detJ;
+      Na_y = (-Na_xi * dx_deta + Na_eta * dx_dxi) / detJ;
+      
+      f_ele(aa) = f_ele(aa) + weight(ll) * detJ * f(x_l, y_l) * Na;
+      
+      for bb = 1 : n_en
+        Nb = Quad(bb, xi(ll), eta(ll));
+        [Nb_xi, Nb_eta] = Quad_grad(bb, xi(ll), eta(ll));
+        Nb_x = (Nb_xi * dy_deta - Nb_eta * dy_dxi) / detJ;
+        Nb_y = (-Nb_xi * dx_deta + Nb_eta * dx_dxi) / detJ;
+        
+        k_ele(aa, bb) = k_ele(aa,bb) + weight(ll) * detJ * kappa * (Na_x * Nb_x + Na_y * Nb_y);
+      end % end of bb loop
+    end % end of aa loop
+  end % end of quadrature loop
+ 
+  for aa = 1 : n_en
+    PP = LM(ee, aa);
+    if PP > 0
+      F(PP) = F(PP) + f_ele(aa);
+      
+      for bb = 1 : n_en
+        QQ = LM(ee, bb);
+        if QQ > 0
+          K(PP, QQ) = K(PP, QQ) + k_ele(aa, bb);
+        else
+          % modify F with the boundary data
+          % here we do nothing because the boundary data g is zero or
+          % homogeneous
+        end
+      end  
+    end
   end
 end
 
-L2_top = sqrt(L2_top); L2_bot = sqrt(L2_bot);
-H1_top = sqrt(H1_top); H1_bot = sqrt(H1_bot);
+% solve the stiffness matrix
+dn = K \ F;
 
-L2_error = L2_top / L2_bot;
-H1_error = H1_top / H1_bot;
+% insert dn back into the vector for all nodes
+disp = zeros(n_np, 1);
+
+for ii = 1 : n_np
+  index = ID(ii);
+  if index > 0
+    disp(ii) = dn(index);
+  else
+    % modify disp with the g data. Here it does nothing because g is zero
+  end
+end
+
+% save the solution vector and number of elements to disp with name
+% HEAT.mat
+save("HEAT", "disp", "n_el_x", "n_el_y");
 
 % EOF
