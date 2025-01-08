@@ -36,3 +36,13 @@ Mesh.ElementOrder = 1;
 Mesh.Algorithm = 8;
 
 // EOF
+//+
+Physical Curve("you", 8) = {5};
+//+
+Physical Curve("shang", 9) = {4};
+//+
+Physical Curve("zuo", 10) = {3};
+//+
+Physical Curve("xia", 11) = {6};
+//+
+Physical Surface("mian", 12) = {2, 1};
