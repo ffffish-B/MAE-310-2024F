@@ -48,7 +48,7 @@ errors_L2 = [];
 errors_H1 = [];
 mesh_sizes = [];
 % mesh generation
-for n_el_x = [3] % 网格密度
+for n_el_x = [10, 20, 40, 80] % 网格密度
     n_en   = 4;               % number of nodes in an element
     n_el_y = n_el_x;               % number of elements in y-dir
     n_el   = n_el_x * n_el_y; % total number of elements

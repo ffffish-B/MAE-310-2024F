@@ -46,3 +46,5 @@ Physical Curve("zuo", 10) = {3};
 Physical Curve("xia", 11) = {6};
 //+
 Physical Surface("mian", 12) = {2, 1};
+//+
+Physical Curve("hu", 13) = {2, 1};
