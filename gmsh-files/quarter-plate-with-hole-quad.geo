@@ -1,5 +1,5 @@
 R = 0.5;
-L = 1.0;
+L = 2.0;
 
 Point(1) = {L, -L, 0};
 Point(2) = {L, L, 0};
@@ -18,13 +18,13 @@ Line(5) = {2, 1};
 Line(6) = {1, 5};
 Line(7) = {2, 7};
 
-Curve Loop(1) = {4, 7, 2, 3};
+Curve Loop(1) = {-3, -2, -7, -4};
 Plane Surface(1) = {1};
 
 Curve Loop(2) = {7, -1, -6, -5};
 Plane Surface(2) = {2};
 
-Transfinite Line{1, 2, 3, 4, 5, 6, 7} = 20;
+Transfinite Line{1, 2, 3, 4, 5, 6, 7} =30 ;
 
 Transfinite Surface{1};
 Transfinite Surface{2};

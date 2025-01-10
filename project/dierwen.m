@@ -1,11 +1,13 @@
-clear all; clc
-run('tu.m')
 
+clear all; clc;close all
+run('tu.m')
+L = 4;%边长
 %指定两个边界条件
-r = @(x,y) sqrt((x+1)^2 + (y+1)^2);
-th = @(x,y) atan2((y+1),(x+1));
+r = @(x,y) sqrt((x+L/2)^2 + (y+L/2)^2);
+th = @(x,y) atan2((y+L/2),(x+L/2));
 Tx = 1e4;
 R = 0.5;
+
 
 xig_rr = @(x,y) Tx/2*(1-R^2/r(x,y)^2)+Tx/2*(1-4*R^2/r(x,y)^2+3*R^4/r(x,y)^4)*cos(2*th(x,y));
 xig_thth = @(x,y) Tx/2*(1+R^2/r(x,y)^2)-Tx/2*(1+3*R^4/r(x,y)^4)*cos(2*th(x,y));
@@ -17,6 +19,7 @@ xig_xy = @(x,y) -xig_rr(x,y)*sin(-th(x,y))*cos(-th(x,y))+xig_thth(x,y)*sin(-th(x
 
 
 
+
 E = 1E9;
 v = 0.3;
 % conductivity
@@ -25,14 +28,14 @@ miu = E / 2 / (1 + v);
 
 D = zeros(3);
 
-%plane strain
+% plane strain
 % D(1,1) = lambda + 2*miu;
 % D(2,2) = D(1,1);
 % D(1,2) = lambda;
 % D(2,1) = D(1,2);
 % D(3,3) = miu;
 
-%plane stress
+% plane stress
 D(1,1) = E/(1-v^2);
 D(2,2) = D(1,1);
 D(1,2) = v*E/(1-v^2);
@@ -67,14 +70,14 @@ for ee = 1:size(IEN,1)
     IEN_tri(ee*2,3) = IEN(ee,4);
 end
 
-for i = 1 : n_el/2
-    a = IEN(i, 1);
-    b = IEN(i, 2);
-    IEN(i, 1) = IEN(i, 4);
-    IEN(i, 2) = IEN(i, 3);
-    IEN(i, 4) = a;
-    IEN(i, 3) = b;
-end
+% for i = 1 : n_el/2
+%     a = IEN(i, 1);
+%     b = IEN(i, 2);
+%     IEN(i, 1) = IEN(i, 4);
+%     IEN(i, 2) = IEN(i, 3);
+%     IEN(i, 4) = a;
+%     IEN(i, 3) = b;
+% end
 
 ID = -1 * ones(n_np,2);
 for nn = 1 : size(lines,1)
@@ -165,7 +168,7 @@ for ee = 1 : n_el
     for qua = 1 : n_int1D       % map阶数
         for aa = 1 : n_en
             pp = 2*(aa-1);
-            if x_ele(aa) == 1 && x_ele(aa+1) == 1
+            if x_ele(aa) == L/2 && x_ele(aa+1) == L/2
                 y_l    = y_ele(aa) * PolyShape(1, 1, xi1D(qua), 0) + y_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 0);
                 dy_dxi = y_ele(aa) * PolyShape(1, 1, xi1D(qua), 1) + y_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 1); % Σxae Na,x (ξ)用高斯积分来积dx/dξ
 
@@ -174,7 +177,7 @@ for ee = 1 : n_el
                 f_ele(pp+2) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_y * dy_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_y * dy_dxi;
             end
 
-            if x_ele(aa) == -1 && x_ele(aa+1) == -1
+            if x_ele(aa) == -L/2 && x_ele(aa+1) == -L/2
                 y_l    = y_ele(aa) * PolyShape(1, 1, xi1D(qua), 0) + y_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 0);
                 dy_dxi = y_ele(aa) * PolyShape(1, 1, xi1D(qua), 1) + y_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 1); % Σxae Na,x (ξ)用高斯积分来积dx/dξ
 
@@ -183,7 +186,7 @@ for ee = 1 : n_el
                 f_ele(pp+2) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_y * dy_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_y * dy_dxi;
             end
 
-            if y_ele(aa) == 1 && y_ele(aa+1) == 1
+            if y_ele(aa) == L/2 && y_ele(aa+1) == L/2
                 x_l    = x_ele(aa) * PolyShape(1, 1, xi1D(qua), 0) + x_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 0);
                 dx_dxi = x_ele(aa) * PolyShape(1, 1, xi1D(qua), 1) + x_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 1); % Σxae Na,x (ξ)用高斯积分来积dx/dξ
 
@@ -192,7 +195,7 @@ for ee = 1 : n_el
                 f_ele(pp+2) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_y * dx_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_y * dx_dxi;
             end
 
-            if y_ele(aa) == -1 && y_ele(aa+1) == -1
+            if y_ele(aa) == -L/2 && y_ele(aa+1) == -L/2
                 x_l    = x_ele(aa) * PolyShape(1, 1, xi1D(qua), 0) + x_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 0);
                 dx_dxi = x_ele(aa) * PolyShape(1, 1, xi1D(qua), 1) + x_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 1); % Σxae Na,x (ξ)用高斯积分来积dx/dξ
 
@@ -357,12 +360,11 @@ for ee = 1:n_el
                 epsilon = epsilon + B_a(:, i) * node_disp;
             end
         end
-        % 这里简单取高斯积分点的平均应变作为单元应变
+        % 取高斯积分点的平均应变作为单元应变
         for qq = 1:3
-            strain(ee, qq) = strain(ee, qq) + weight2D(ll) * epsilon(qq);
+            strain(ee, qq) = strain(ee, qq) + weight2D(ll) * epsilon(qq) * detJ;
         end
     end
-    strain(ee, :) = strain(ee, :) / n_int2D;
 end
 
 stress = zeros(n_el, 3);
@@ -390,7 +392,7 @@ for ee = 1:n_el
     for aa = 1:n_en
         node_index = IEN(ee, aa);
         % 用单元面积加权
-        node_strain(node_index, :) = node_strain(node_index, :) + element_area(ee) * strain(ee, :);
+        node_strain(node_index, :) = node_strain(node_index, :) +  strain(ee, :);
     end
 end
 % 对每个节点的应变进行平均
@@ -479,10 +481,27 @@ ylabel('y - coordinate');
 
 
 
+node_stress_exact = zeros(n_np,3);
+for ii = 1 : n_np
+    node_stress_exact(ii,1) = xig_xx(x_coor(ii),y_coor(ii));
+    node_stress_exact(ii,2) = xig_yy(x_coor(ii),y_coor(ii));
+    node_stress_exact(ii,3) = xig_xy(x_coor(ii),y_coor(ii));
+end
 
 
 
 
+figure;                     %解析解x方向
+hold on
+trisurf(IEN_tri, x_coor, y_coor, node_stress_exact(:, 1));
+axis equal;
+colormap jet
+shading interp
+title('Shear stress (\sigma_{xx})jiexijie');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+
+colorbar
 
 
 
@@ -494,8 +513,9 @@ ylabel('y - coordinate');
 
 function [h_x, h_y] = hh (x, y, n_x, n_y)
 
-r = @(x,y) sqrt((x+1)^2 + (y+1)^2);
-th = @(x,y) atan2((y+1),(x+1));
+L = 4;
+r = @(x,y) sqrt((x+L/2)^2 + (y+L/2)^2);
+th = @(x,y) atan2((y+L/2),(x+L/2));
 Tx = 1e4;
 R = 0.5;
 
@@ -523,6 +543,12 @@ end
 h_x = h(1);
 h_y = h(2);
 end
+
+
+
+
+
+
 function e_i = unit_vector(ii)
 if ii == 1
     e_i = [1,0]';
