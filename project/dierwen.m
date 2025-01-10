@@ -163,48 +163,42 @@ for ee = 1 : n_el
     f_ele = zeros(2*n_en, 1);    % element load vector
     % quadrature loop
     for qua = 1 : n_int1D       % map阶数
-        dx_dxi = 0.0;           % dx/dξ
-        dy_dxi = 0.0;
-        x_l = 0.0;              % x(ξl)
-        y_l = 0.0;
-        % 求局部系数矩阵Kab
-
         for aa = 1 : n_en
             pp = 2*(aa-1);
             if x_ele(aa) == 1 && x_ele(aa+1) == 1
-                y_l    = y_l    + y_ele(aa) * PolyShape(1, 1, xi1D(qua), 0) + y_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 0);
-                dy_dxi = dy_dxi + y_ele(aa) * PolyShape(1, 1, xi1D(qua), 1) + y_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 1); % Σxae Na,x (ξ)用高斯积分来积dx/dξ
+                y_l    = y_ele(aa) * PolyShape(1, 1, xi1D(qua), 0) + y_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 0);
+                dy_dxi = y_ele(aa) * PolyShape(1, 1, xi1D(qua), 1) + y_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 1); % Σxae Na,x (ξ)用高斯积分来积dx/dξ
 
                 [h_x, h_y] = hh(1,y_l,1,0);
-                f_ele(pp+1) = f_ele(pp+1) + weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_x * dy_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_x * dy_dxi;
-                f_ele(pp+2) = f_ele(pp+2) + weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_y * dy_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_y * dy_dxi;
+                f_ele(pp+1) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_x * dy_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_x * dy_dxi;
+                f_ele(pp+2) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_y * dy_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_y * dy_dxi;
             end
 
             if x_ele(aa) == -1 && x_ele(aa+1) == -1
-                y_l    = y_l    + y_ele(aa) * PolyShape(1, 1, xi1D(qua), 0) + y_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 0);
-                dy_dxi = dy_dxi + y_ele(aa) * PolyShape(1, 1, xi1D(qua), 1) + y_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 1); % Σxae Na,x (ξ)用高斯积分来积dx/dξ
+                y_l    = y_ele(aa) * PolyShape(1, 1, xi1D(qua), 0) + y_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 0);
+                dy_dxi = y_ele(aa) * PolyShape(1, 1, xi1D(qua), 1) + y_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 1); % Σxae Na,x (ξ)用高斯积分来积dx/dξ
 
                 [h_x, h_y] = hh(-1,y_l,-1,0);
-                f_ele(pp+1) = f_ele(pp+1) + weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_x * dy_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_x * dy_dxi;
-                f_ele(pp+2) = f_ele(pp+2) + weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_y * dy_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_y * dy_dxi;
+                f_ele(pp+1) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_x * dy_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_x * dy_dxi;
+                f_ele(pp+2) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_y * dy_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_y * dy_dxi;
             end
 
             if y_ele(aa) == 1 && y_ele(aa+1) == 1
-                x_l    = x_l    + x_ele(aa) * PolyShape(1, 1, xi1D(qua), 0) + x_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 0);
-                dx_dxi = dx_dxi + x_ele(aa) * PolyShape(1, 1, xi1D(qua), 1) + x_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 1); % Σxae Na,x (ξ)用高斯积分来积dx/dξ
+                x_l    = x_ele(aa) * PolyShape(1, 1, xi1D(qua), 0) + x_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 0);
+                dx_dxi = x_ele(aa) * PolyShape(1, 1, xi1D(qua), 1) + x_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 1); % Σxae Na,x (ξ)用高斯积分来积dx/dξ
 
                 [h_x, h_y] = hh(x_l,1,0,1);
-                f_ele(pp+1) = f_ele(pp+1) + weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_x * dx_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_x * dx_dxi;
-                f_ele(pp+2) = f_ele(pp+2) + weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_y * dx_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_y * dx_dxi;
+                f_ele(pp+1) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_x * dx_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_x * dx_dxi;
+                f_ele(pp+2) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_y * dx_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_y * dx_dxi;
             end
 
             if y_ele(aa) == -1 && y_ele(aa+1) == -1
-                x_l    = x_l    + x_ele(aa) * PolyShape(1, 1, xi1D(qua), 0) + x_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 0);
-                dx_dxi = dx_dxi + x_ele(aa) * PolyShape(1, 1, xi1D(qua), 1) + x_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 1); % Σxae Na,x (ξ)用高斯积分来积dx/dξ
+                x_l    = x_ele(aa) * PolyShape(1, 1, xi1D(qua), 0) + x_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 0);
+                dx_dxi = x_ele(aa) * PolyShape(1, 1, xi1D(qua), 1) + x_ele(aa+1) * PolyShape(1, 2, xi1D(qua), 1); % Σxae Na,x (ξ)用高斯积分来积dx/dξ
 
                 [h_x, h_y] = hh(x_l,-1,0,-1);
-                f_ele(pp+1) = f_ele(pp+1) + weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_x * dx_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_x * dx_dxi;
-                f_ele(pp+2) = f_ele(pp+2) + weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_y * dx_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_y * dx_dxi;
+                f_ele(pp+1) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_x * dx_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_x * dx_dxi;
+                f_ele(pp+2) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_y * dx_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_y * dx_dxi;
             end
         end
     end
@@ -301,14 +295,196 @@ for ii = 1 : n_np
     end
 end
 
-% hold on;
 
-trisurf(IEN_tri, x_coor, y_coor, disp(:,2));
 
+
+
+figure;
+hold on;
+trisurf(IEN_tri, x_coor, y_coor, disp(:,1));
 axis equal;
-
 colormap jet
 shading interp
+title('x - direction displacement (d_x)');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+
+figure;
+hold on;
+trisurf(IEN_tri, x_coor, y_coor, disp(:,2));
+axis equal;
+colormap jet
+shading interp
+title('y - direction displacement (d_y)');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+
+
+
+
+strain = zeros(n_el, 3);
+for ee = 1:n_el
+    x_ele = [x_coor( IEN(ee, 1:n_en) );x_coor( IEN(ee, 1) )];
+    y_ele = [y_coor( IEN(ee, 1:n_en) );y_coor( IEN(ee, 1) )];
+    for ll = 1:n_int2D
+        x_l = 0.0; y_l = 0.0;
+        dx_dxi = 0.0; dx_deta = 0.0;
+        dy_dxi = 0.0; dy_deta = 0.0;
+        for aa = 1:n_en
+            x_l = x_l + x_ele(aa) * Quad(aa, xi2D(ll), eta2D(ll));
+            y_l = y_l + y_ele(aa) * Quad(aa, xi2D(ll), eta2D(ll));
+            [Na_xi, Na_eta] = Quad_grad(aa, xi2D(ll), eta2D(ll));
+            dx_dxi  = dx_dxi  + x_ele(aa) * Na_xi;
+            dx_deta = dx_deta + x_ele(aa) * Na_eta;
+            dy_dxi  = dy_dxi  + y_ele(aa) * Na_xi;
+            dy_deta = dy_deta + y_ele(aa) * Na_eta;
+        end
+        detJ = dx_dxi * dy_deta - dx_deta * dy_dxi;
+        epsilon = zeros(3, 1);
+        for aa = 1:n_en
+            Na = Quad(aa, xi2D(ll), eta2D(ll));
+            [Na_xi, Na_eta] = Quad_grad(aa, xi2D(ll), eta2D(ll));
+            Na_x = (Na_xi * dy_deta - Na_eta * dy_dxi) / detJ;
+            Na_y = (-Na_xi * dx_deta + Na_eta * dx_dxi) / detJ;
+            B_a = zeros(3, 2);
+            B_a(1, 1) = Na_x;
+            B_a(2, 2) = Na_y;
+            B_a(3, 1) = Na_y;
+            B_a(3, 2) = Na_x;
+            for i = 1:2
+                p = 2 * (aa - 1)+i;
+                node_disp = disp(IEN(ee, aa), i);
+                epsilon = epsilon + B_a(:, i) * node_disp;
+            end
+        end
+        % 这里简单取高斯积分点的平均应变作为单元应变
+        for qq = 1:3
+            strain(ee, qq) = strain(ee, qq) + weight2D(ll) * epsilon(qq);
+        end
+    end
+    strain(ee, :) = strain(ee, :) / n_int2D;
+end
+
+stress = zeros(n_el, 3);
+for ee = 1:n_el
+    stress(ee, :) = D * strain(ee, :)';
+end
+
+% 初始化节点应变数组，每个节点有3个应变分量（xx, yy, xy）
+node_strain = zeros(n_np, 3);
+% 计算每个单元的面积（假设单元为四边形，这里简单用叉积法估算）
+element_area = zeros(n_el, 1);
+for ee = 1:n_el
+    x1 = x_coor(IEN(ee, 1));
+    y1 = y_coor(IEN(ee, 1));
+    x2 = x_coor(IEN(ee, 2));
+    y2 = y_coor(IEN(ee, 2));
+    x3 = x_coor(IEN(ee, 3));
+    y3 = y_coor(IEN(ee, 3));
+    x4 = x_coor(IEN(ee, 4));
+    y4 = y_coor(IEN(ee, 4));
+    area1 = 0.5 * abs((x1 - x3) * (y2 - y4)-(x2 - x4) * (y1 - y3));
+    element_area(ee) = area1;
+end
+for ee = 1:n_el
+    for aa = 1:n_en
+        node_index = IEN(ee, aa);
+        % 用单元面积加权
+        node_strain(node_index, :) = node_strain(node_index, :) + element_area(ee) * strain(ee, :);
+    end
+end
+% 对每个节点的应变进行平均
+for nn = 1:n_np
+    total_area = 0;
+    for ee = 1:n_el
+        if any(IEN(ee, :) == nn)
+            total_area = total_area + element_area(ee);
+        end
+    end
+    if total_area > 0
+        node_strain(nn, :) = node_strain(nn, :) / total_area;
+    end
+end
+
+% 初始化节点应力数组，每个节点有3个应力分量（xx, yy, xy）
+node_stress = zeros(n_np, 3);
+for nn = 1:n_np
+    node_stress(nn, :) = D * node_strain(nn, :)';
+end
+
+
+
+
+figure;                     %x方向应力
+hold on
+trisurf(IEN_tri, x_coor, y_coor, node_stress(:, 1));
+axis equal;
+colormap jet
+shading interp
+title('x - direction stress (\sigma_{xx})');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+
+figure;                     %y方向应力
+hold on
+trisurf(IEN_tri, x_coor, y_coor, node_stress(:, 2));
+axis equal;
+colormap jet
+shading interp
+title('y - direction stress (\sigma_{yy})');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+
+figure;                     %xy扭矩
+hold on
+trisurf(IEN_tri, x_coor, y_coor, node_stress(:, 3));
+axis equal;
+colormap jet
+shading interp
+title('Shear stress (\sigma_{xy})');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+
+%%%%%%%%%%%%%
+
+figure;                     %x方向应变
+hold on
+trisurf(IEN_tri, x_coor, y_coor, node_strain(:, 1));
+axis equal;
+colormap jet
+shading interp
+title('x - direction strain (\sigma_{xx})');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+
+figure;                     %y方向应变
+hold on
+trisurf(IEN_tri, x_coor, y_coor, node_strain(:, 2));
+axis equal;
+colormap jet
+shading interp
+title('y - direction strain (\sigma_{yy})');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+
+figure;                     %xy扭转
+hold on
+trisurf(IEN_tri, x_coor, y_coor, node_strain(:, 3));
+axis equal;
+colormap jet
+shading interp
+title('Shear strain (\sigma_{xy})');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+
+
+
+
+
+
+
+
+
 
 
 
