@@ -1,6 +1,4 @@
 
-clear all; clc;close all
-run('tu.m')
 L = 4;%边长
 %指定两个边界条件
 r = @(x,y) sqrt((x+L/2)^2 + (y+L/2)^2);
@@ -27,13 +25,6 @@ lambda = v * E / (1 + v) / (1 - 2 * v);
 miu = E / 2 / (1 + v);
 
 D = zeros(3);
-
-% plane strain
-% D(1,1) = lambda + 2*miu;
-% D(2,2) = D(1,1);
-% D(1,2) = lambda;
-% D(2,1) = D(1,2);
-% D(3,3) = miu;
 
 % plane stress
 D(1,1) = E/(1-v^2);
@@ -70,15 +61,6 @@ for ee = 1:size(IEN,1)
     IEN_tri(ee*2,3) = IEN(ee,4);
 end
 
-% for i = 1 : n_el/2
-%     a = IEN(i, 1);
-%     b = IEN(i, 2);
-%     IEN(i, 1) = IEN(i, 4);
-%     IEN(i, 2) = IEN(i, 3);
-%     IEN(i, 4) = a;
-%     IEN(i, 3) = b;
-% end
-
 ID = -1 * ones(n_np,2);
 for nn = 1 : size(lines,1)
     if lines(nn,3) == 8
@@ -114,31 +96,6 @@ end
 
 
 n_eq = counter - 1;
-
-n_vector = lines; %向量
-for nn = 1 : size(n_vector)
-    if n_vector(nn, 3) == 13
-        n_vector(nn, 1) = -(pos(lines(nn, 1), 1) + pos(lines(nn, 2), 1)) / 2 - 1;
-        n_vector(nn, 2) = -(pos(lines(nn, 1), 2) + pos(lines(nn, 2), 2)) / 2 - 1;
-        norm = sqrt(n_vector(nn, 1)^2+n_vector(nn, 2)^2);
-        n_vector(nn, 1) = n_vector(nn, 1) / norm;
-        n_vector(nn, 2) = n_vector(nn, 2) / norm;
-    elseif n_vector(nn, 3) == 11
-        n_vector(nn, 1) = 0;
-        n_vector(nn, 2) = -1;
-    elseif n_vector(nn, 3) == 10
-        n_vector(nn, 1) = -1;
-        n_vector(nn, 2) = 0;
-    elseif n_vector(nn, 3) == 9
-        n_vector(nn, 1) = 0;
-        n_vector(nn, 2) = 1;
-    elseif n_vector(nn, 3) == 8
-        n_vector(nn, 1) = 1;
-        n_vector(nn, 2) = 0;
-    end
-end
-
-vector = n_vector(:, 1:2);
 
 
 
@@ -304,34 +261,6 @@ for ii = 1 : n_np
 end
 
 
-
-
-
-figure;
-hold on;
-trisurf(IEN_tri, x_coor, y_coor, disp(:,1));
-axis equal;
-colormap jet
-shading interp
-title('x - direction displacement (d_x)');
-xlabel('x - coordinate');
-ylabel('y - coordinate');
-colorbar
-
-figure;
-hold on;
-trisurf(IEN_tri, x_coor, y_coor, disp(:,2));
-axis equal;
-colormap jet
-shading interp
-title('y - direction displacement (d_y)');
-xlabel('x - coordinate');
-ylabel('y - coordinate');
-colorbar
-
-
-
-
 strain = zeros(n_el, 3);
 for ee = 1:n_el
     x_ele = [x_coor( IEN(ee, 1:n_en) );x_coor( IEN(ee, 1) )];
@@ -423,78 +352,6 @@ end
 
 
 
-
-
-figure;                     %x方向应力
-hold on
-trisurf(IEN_tri, x_coor, y_coor, node_stress(:, 1));
-axis equal;
-colormap jet
-shading interp
-title('x - direction stress (\sigma_{xx})');
-xlabel('x - coordinate');
-ylabel('y - coordinate');
-colorbar
-
-% figure;                     %y方向应力
-% hold on
-% trisurf(IEN_tri, x_coor, y_coor, node_stress(:, 2));
-% axis equal;
-% colormap jet
-% shading interp
-% title('y - direction stress (\sigma_{yy})');
-% xlabel('x - coordinate');
-% ylabel('y - coordinate');
-% colorbar
-
-% figure;                     %xy扭矩
-% hold on
-% trisurf(IEN_tri, x_coor, y_coor, node_stress(:, 3));
-% axis equal;
-% colormap jet
-% shading interp
-% title('Shear stress (\sigma_{xy})');
-% xlabel('x - coordinate');
-% ylabel('y - coordinate');
-% colorbar
-
-%%%%%%%%%%%%%
-
-% figure;                     %x方向应变
-% hold on
-% trisurf(IEN_tri, x_coor, y_coor, node_strain(:, 1));
-% axis equal;
-% colormap jet
-% shading interp
-% title('x - direction strain (\sigma_{xx})');
-% xlabel('x - coordinate');
-% ylabel('y - coordinate');
-% colorbar
-% 
-% figure;                     %y方向应变
-% hold on
-% trisurf(IEN_tri, x_coor, y_coor, node_strain(:, 2));
-% axis equal;
-% colormap jet
-% shading interp
-% title('y - direction strain (\sigma_{yy})');
-% xlabel('x - coordinate');
-% ylabel('y - coordinate');
-% colorbar
-% 
-% figure;                     %xy扭转
-% hold on
-% trisurf(IEN_tri, x_coor, y_coor, node_strain(:, 3));
-% axis equal;
-% colormap jet
-% shading interp
-% title('Shear strain (\sigma_{xy})');
-% xlabel('x - coordinate');
-% ylabel('y - coordinate');
-% colorbar
-
-
-
 node_stress_exact = zeros(n_np,3);
 for ii = 1 : n_np
     node_stress_exact(ii,1) = xig_xx(x_coor(ii),y_coor(ii));
@@ -503,19 +360,6 @@ for ii = 1 : n_np
 end
 
 
-
-
-figure;                     %解析解x方向
-hold on
-trisurf(IEN_tri, x_coor, y_coor, node_stress_exact(:, 1));
-axis equal;
-colormap jet
-shading interp
-title('Shear stress (\sigma_{xx})jiexijie');
-xlabel('x - coordinate');
-ylabel('y - coordinate');
-
-colorbar
 
 
 

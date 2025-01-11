@@ -203,12 +203,6 @@ for ee = 1 : n_el
                 f_ele(pp+1) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_x * dx_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_x * dx_dxi;
                 f_ele(pp+2) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_y * dx_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_y * dx_dxi;
             end
-            for i = 1 : 2
-                PP = ID(IEN(ee, aa) ,i);
-                if PP > 0
-                    F(PP) = F(PP) + f_ele(2*(aa-1)+i);
-                end
-            end
         end
     end
     for ll = 1 : n_int2D
@@ -268,6 +262,7 @@ for ee = 1 : n_el
         for i = 1 : 2
             PP = ID(IEN(ee, aa) ,i);
             if PP > 0
+                F(PP) = F(PP) + f_ele(2*(aa-1)+i);
                 for bb = 1 : n_en
                     for j = 1 : 2
                         QQ = ID(IEN(ee, bb), j);
@@ -306,28 +301,26 @@ end
 
 
 
-
-figure;
-hold on;
-trisurf(IEN_tri, x_coor, y_coor, disp(:,1));
-axis equal;
-colormap jet
-shading interp
-title('x - direction displacement (d_x)');
-xlabel('x - coordinate');
-ylabel('y - coordinate');
-colorbar
-
-figure;
-hold on;
-trisurf(IEN_tri, x_coor, y_coor, disp(:,2));
-axis equal;
-colormap jet
-shading interp
-title('y - direction displacement (d_y)');
-xlabel('x - coordinate');
-ylabel('y - coordinate');
-colorbar
+% 
+% figure;
+% hold on;
+% trisurf(IEN_tri, x_coor, y_coor, disp(:,1));
+% axis equal;
+% colormap jet
+% shading interp
+% title('x - direction displacement (d_x)');
+% xlabel('x - coordinate');
+% ylabel('y - coordinate');
+% 
+% figure;
+% hold on;
+% trisurf(IEN_tri, x_coor, y_coor, disp(:,2));
+% axis equal;
+% colormap jet
+% shading interp
+% title('y - direction displacement (d_y)');
+% xlabel('x - coordinate');
+% ylabel('y - coordinate');
 
 
 
@@ -425,6 +418,9 @@ end
 
 
 
+
+
+
 figure;                     %x方向应力
 hold on
 trisurf(IEN_tri, x_coor, y_coor, node_stress(:, 1));
@@ -434,7 +430,6 @@ shading interp
 title('x - direction stress (\sigma_{xx})');
 xlabel('x - coordinate');
 ylabel('y - coordinate');
-colorbar
 
 % figure;                     %y方向应力
 % hold on
@@ -445,7 +440,6 @@ colorbar
 % title('y - direction stress (\sigma_{yy})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
-% colorbar
 
 % figure;                     %xy扭矩
 % hold on
@@ -456,7 +450,6 @@ colorbar
 % title('Shear stress (\sigma_{xy})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
-% colorbar
 
 %%%%%%%%%%%%%
 
@@ -469,7 +462,6 @@ colorbar
 % title('x - direction strain (\sigma_{xx})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
-% colorbar
 % 
 % figure;                     %y方向应变
 % hold on
@@ -480,7 +472,6 @@ colorbar
 % title('y - direction strain (\sigma_{yy})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
-% colorbar
 % 
 % figure;                     %xy扭转
 % hold on
@@ -491,8 +482,7 @@ colorbar
 % title('Shear strain (\sigma_{xy})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
-% colorbar
-
+% 
 
 
 node_stress_exact = zeros(n_np,3);
@@ -527,35 +517,13 @@ colorbar
 
 function [h_x, h_y] = hh (x, y, n_x, n_y)
 
-L = 4;
-r = @(x,y) sqrt((x+L/2)^2 + (y+L/2)^2);
-th = @(x,y) atan2((y+L/2),(x+L/2));
-Tx = 1e4;
-R = 0.5;
-
-xig_rr = @(x,y) Tx/2*(1-R^2/r(x,y)^2)+Tx/2*(1-4*R^2/r(x,y)^2+3*R^4/r(x,y)^4)*cos(2*th(x,y));
-xig_thth = @(x,y) Tx/2*(1+R^2/r(x,y)^2)-Tx/2*(1+3*R^4/r(x,y)^4)*cos(2*th(x,y));
-xig_rth = @(x,y) -Tx/2*(1+2*R^2/r(x,y)^2-3*R^4/r(x,y)^4)*sin(2*th(x,y));
-
-xig_xx = @(x,y) xig_rr(x,y)*cos(-th(x,y))^2+xig_thth(x,y)*sin(-th(x,y))^2+2*xig_rth(x,y)*sin(-th(x,y))*cos(-th(x,y));
-xig_yy = @(x,y) xig_rr(x,y)*sin(-th(x,y))^2+xig_thth(x,y)*cos(-th(x,y))^2-2*xig_rth(x,y)*sin(-th(x,y))*cos(-th(x,y));
-xig_xy = @(x,y) -xig_rr(x,y)*sin(-th(x,y))*cos(-th(x,y))+xig_thth(x,y)*sin(-th(x,y))*cos(-th(x,y))+xig_rth(x,y)*(cos(-th(x,y))^2-sin(-th(x,y))^2);
-
-xig_ij = zeros(2,2);
-h = zeros(2,1);
-
-vector = [n_x, n_y]';
-xig_ij(1,1) = xig_xx(x,y);
-xig_ij(1,2) = xig_xy(x,y);
-xig_ij(2,1) = xig_xy(x,y);
-xig_ij(2,2) = xig_yy(x,y);
-for i = 1 : 2
-    for j = 1 : 2
-        h(i) = h(i) + xig_ij(i,j) * vector(j);
-    end
+if n_x == 1 && n_y == 0
+    h_x = 1e4;
+    h_y = 0;
+else
+    h_x = 0;
+    h_y = 0;
 end
-h_x = h(1);
-h_y = h(2);
 end
 
 
@@ -572,4 +540,3 @@ end
 end
 
 
-%EOF

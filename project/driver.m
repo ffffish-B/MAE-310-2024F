@@ -284,6 +284,8 @@ for n_el_x = [10, 20, 40, 80] % 网格密度
     % HEAT.mat
     save("HEAT", "disp", "n_el_x", "n_el_y");
 end
+
+
 % close all;
 % [X, Y] = meshgrid(0 : hx : 1, 0 : hy : 1);
 % hold on
