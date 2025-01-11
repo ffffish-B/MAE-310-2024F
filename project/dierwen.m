@@ -306,26 +306,28 @@ end
 
 
 
-% 
-% figure;
-% hold on;
-% trisurf(IEN_tri, x_coor, y_coor, disp(:,1));
-% axis equal;
-% colormap jet
-% shading interp
-% title('x - direction displacement (d_x)');
-% xlabel('x - coordinate');
-% ylabel('y - coordinate');
-% 
-% figure;
-% hold on;
-% trisurf(IEN_tri, x_coor, y_coor, disp(:,2));
-% axis equal;
-% colormap jet
-% shading interp
-% title('y - direction displacement (d_y)');
-% xlabel('x - coordinate');
-% ylabel('y - coordinate');
+
+figure;
+hold on;
+trisurf(IEN_tri, x_coor, y_coor, disp(:,1));
+axis equal;
+colormap jet
+shading interp
+title('x - direction displacement (d_x)');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+colorbar
+
+figure;
+hold on;
+trisurf(IEN_tri, x_coor, y_coor, disp(:,2));
+axis equal;
+colormap jet
+shading interp
+title('y - direction displacement (d_y)');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+colorbar
 
 
 
@@ -435,6 +437,7 @@ shading interp
 title('x - direction stress (\sigma_{xx})');
 xlabel('x - coordinate');
 ylabel('y - coordinate');
+colorbar
 
 % figure;                     %y方向应力
 % hold on
@@ -445,6 +448,7 @@ ylabel('y - coordinate');
 % title('y - direction stress (\sigma_{yy})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
+% colorbar
 
 % figure;                     %xy扭矩
 % hold on
@@ -455,6 +459,7 @@ ylabel('y - coordinate');
 % title('Shear stress (\sigma_{xy})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
+% colorbar
 
 %%%%%%%%%%%%%
 
@@ -467,6 +472,7 @@ ylabel('y - coordinate');
 % title('x - direction strain (\sigma_{xx})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
+% colorbar
 % 
 % figure;                     %y方向应变
 % hold on
@@ -477,6 +483,7 @@ ylabel('y - coordinate');
 % title('y - direction strain (\sigma_{yy})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
+% colorbar
 % 
 % figure;                     %xy扭转
 % hold on
@@ -487,7 +494,8 @@ ylabel('y - coordinate');
 % title('Shear strain (\sigma_{xy})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
-% 
+% colorbar
+
 
 
 node_stress_exact = zeros(n_np,3);
