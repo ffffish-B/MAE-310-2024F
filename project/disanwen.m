@@ -1,7 +1,7 @@
 
 clear all; clc;close all
 run('tu.m')
-L = 4;%边长
+L = 2;%边长
 %指定两个边界条件
 r = @(x,y) sqrt((x+L/2)^2 + (y+L/2)^2);
 th = @(x,y) atan2((y+L/2),(x+L/2));

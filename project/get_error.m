@@ -1,5 +1,5 @@
 
-L = 4;%边长
+L = 2;%边长
 %指定两个边界条件
 r = @(x,y) sqrt((x+L/2)^2 + (y+L/2)^2);
 th = @(x,y) atan2((y+L/2),(x+L/2));
@@ -394,7 +394,7 @@ end
 
 function [h_x, h_y] = hh (x, y, n_x, n_y)
 
-L = 4;
+L = 2;
 r = @(x,y) sqrt((x+L/2)^2 + (y+L/2)^2);
 th = @(x,y) atan2((y+L/2),(x+L/2));
 Tx = 1e4;
