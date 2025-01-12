@@ -1,4 +1,4 @@
-clear all; clc;
+clear; clc; close all
 
 E = 1E9;
 v = 0.3;
@@ -285,15 +285,23 @@ for n_el_x = [10, 20, 40, 80] % 网格密度
     save("HEAT", "disp", "n_el_x", "n_el_y");
 end
 
+figure;
+[X, Y] = meshgrid(0 : hx : 1, 0 : hy : 1);
+hold on
+Z = reshape(disp(:,1), n_np_x, n_np_y)';
+surf(X, Y, Z);
 
-% close all;
-% [X, Y] = meshgrid(0 : hx : 1, 0 : hy : 1);
-% hold on
-% Z = reshape(disp(:,1), n_np_x, n_np_y)';
-% surf(X, Y, Z);
-%
-% shading interp;
-% axis equal;
+shading interp;
+axis equal;
+
+figure;
+[X, Y] = meshgrid(0 : hx : 1, 0 : hy : 1);
+hold on
+Z = reshape(disp(:,2), n_np_x, n_np_y)';
+surf(X, Y, Z);
+
+shading interp;
+axis equal;
 
 figure;
 loglog(mesh_sizes, errors_L2(1,:), '-o', 'DisplayName', 'L2 Norm');

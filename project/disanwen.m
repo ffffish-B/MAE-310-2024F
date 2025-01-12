@@ -1,5 +1,5 @@
 
-clear all; clc;close all
+clear; clc;close all
 run('tu.m')
 L = 2;%边长
 %指定两个边界条件
@@ -381,7 +381,7 @@ end
 
 % 初始化节点应变数组，每个节点有3个应变分量（xx, yy, xy）
 node_strain = zeros(n_np, 3);
-% 计算每个单元的面积（假设单元为四边形，这里简单用叉积法估算）
+% 计算每个单元的面积（假设单元为四边形）
 element_area = zeros(n_el, 1);
 for ee = 1:n_el
     x1 = x_coor(IEN(ee, 1));
@@ -466,7 +466,7 @@ colorbar
 % axis equal;
 % colormap jet
 % shading interp
-% title('x - direction strain (\sigma_{xx})');
+% title('x - direction strain (\epsilon_{xx})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
 % colorbar
@@ -477,7 +477,7 @@ colorbar
 % axis equal;
 % colormap jet
 % shading interp
-% title('y - direction strain (\sigma_{yy})');
+% title('y - direction strain (\epsilon_{yy})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
 % colorbar
@@ -488,18 +488,44 @@ colorbar
 % axis equal;
 % colormap jet
 % shading interp
-% title('Shear strain (\sigma_{xy})');
+% title('Shear strain (\epsilon_{xy})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
 % colorbar
 
 
 
+node_stress_exact = zeros(n_np,3);
+for ii = 1 : n_np
+    node_stress_exact(ii,1) = xig_xx(x_coor(ii),y_coor(ii));
+    node_stress_exact(ii,2) = xig_yy(x_coor(ii),y_coor(ii));
+    node_stress_exact(ii,3) = xig_xy(x_coor(ii),y_coor(ii));
+end
 
 
 
 
-function [h_x, h_y] = hh (x, y, n_x, n_y)
+figure;                     %解析解x方向
+hold on
+trisurf(IEN_tri, x_coor, y_coor, node_stress_exact(:, 1));
+axis equal;
+colormap jet
+shading interp
+title('Shear stress (\sigma_{xx})jiexijie');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+
+colorbar
+
+
+
+
+
+
+
+
+
+function [h_x, h_y] = hh (~, ~, n_x, n_y)
 
 if n_x == 1 && n_y == 0
     h_x = 1e4;

@@ -115,30 +115,7 @@ end
 
 n_eq = counter - 1;
 
-n_vector = lines; %向量
-for nn = 1 : size(n_vector)
-    if n_vector(nn, 3) == 13
-        n_vector(nn, 1) = -(pos(lines(nn, 1), 1) + pos(lines(nn, 2), 1)) / 2 - 1;
-        n_vector(nn, 2) = -(pos(lines(nn, 1), 2) + pos(lines(nn, 2), 2)) / 2 - 1;
-        norm = sqrt(n_vector(nn, 1)^2+n_vector(nn, 2)^2);
-        n_vector(nn, 1) = n_vector(nn, 1) / norm;
-        n_vector(nn, 2) = n_vector(nn, 2) / norm;
-    elseif n_vector(nn, 3) == 11
-        n_vector(nn, 1) = 0;
-        n_vector(nn, 2) = -1;
-    elseif n_vector(nn, 3) == 10
-        n_vector(nn, 1) = -1;
-        n_vector(nn, 2) = 0;
-    elseif n_vector(nn, 3) == 9
-        n_vector(nn, 1) = 0;
-        n_vector(nn, 2) = 1;
-    elseif n_vector(nn, 3) == 8
-        n_vector(nn, 1) = 1;
-        n_vector(nn, 2) = 0;
-    end
-end
 
-vector = n_vector(:, 1:2);
 
 
 
@@ -381,7 +358,7 @@ end
 
 % 初始化节点应变数组，每个节点有3个应变分量（xx, yy, xy）
 node_strain = zeros(n_np, 3);
-% 计算每个单元的面积（假设单元为四边形，这里简单用叉积法估算）
+% 计算每个单元的面积（假设单元为四边形）
 element_area = zeros(n_el, 1);
 for ee = 1:n_el
     x1 = x_coor(IEN(ee, 1));
@@ -436,62 +413,62 @@ xlabel('x - coordinate');
 ylabel('y - coordinate');
 colorbar
 
-% figure;                     %y方向应力
-% hold on
-% trisurf(IEN_tri, x_coor, y_coor, node_stress(:, 2));
-% axis equal;
-% colormap jet
-% shading interp
-% title('y - direction stress (\sigma_{yy})');
-% xlabel('x - coordinate');
-% ylabel('y - coordinate');
-% colorbar
+figure;                     %y方向应力
+hold on
+trisurf(IEN_tri, x_coor, y_coor, node_stress(:, 2));
+axis equal;
+colormap jet
+shading interp
+title('y - direction stress (\sigma_{yy})');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+colorbar
 
-% figure;                     %xy扭矩
-% hold on
-% trisurf(IEN_tri, x_coor, y_coor, node_stress(:, 3));
-% axis equal;
-% colormap jet
-% shading interp
-% title('Shear stress (\sigma_{xy})');
-% xlabel('x - coordinate');
-% ylabel('y - coordinate');
-% colorbar
+figure;                     %xy扭矩
+hold on
+trisurf(IEN_tri, x_coor, y_coor, node_stress(:, 3));
+axis equal;
+colormap jet
+shading interp
+title('Shear stress (\sigma_{xy})');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+colorbar
 
-%%%%%%%%%%%%%
+%%%%%%%%%%%%
 
-% figure;                     %x方向应变
-% hold on
-% trisurf(IEN_tri, x_coor, y_coor, node_strain(:, 1));
-% axis equal;
-% colormap jet
-% shading interp
-% title('x - direction strain (\sigma_{xx})');
-% xlabel('x - coordinate');
-% ylabel('y - coordinate');
-% colorbar
-% 
-% figure;                     %y方向应变
-% hold on
-% trisurf(IEN_tri, x_coor, y_coor, node_strain(:, 2));
-% axis equal;
-% colormap jet
-% shading interp
-% title('y - direction strain (\sigma_{yy})');
-% xlabel('x - coordinate');
-% ylabel('y - coordinate');
-% colorbar
-% 
-% figure;                     %xy扭转
-% hold on
-% trisurf(IEN_tri, x_coor, y_coor, node_strain(:, 3));
-% axis equal;
-% colormap jet
-% shading interp
-% title('Shear strain (\sigma_{xy})');
-% xlabel('x - coordinate');
-% ylabel('y - coordinate');
-% colorbar
+figure;                     %x方向应变
+hold on
+trisurf(IEN_tri, x_coor, y_coor, node_strain(:, 1));
+axis equal;
+colormap jet
+shading interp
+title('x - direction strain (\epsilon_{xx})');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+colorbar
+
+figure;                     %y方向应变
+hold on
+trisurf(IEN_tri, x_coor, y_coor, node_strain(:, 2));
+axis equal;
+colormap jet
+shading interp
+title('y - direction strain (\epsilon_{yy})');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+colorbar
+
+figure;                     %xy扭转
+hold on
+trisurf(IEN_tri, x_coor, y_coor, node_strain(:, 3));
+axis equal;
+colormap jet
+shading interp
+title('Shear strain (\epsilon_{xy})');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+colorbar
 
 
 
@@ -511,14 +488,11 @@ trisurf(IEN_tri, x_coor, y_coor, node_stress_exact(:, 1));
 axis equal;
 colormap jet
 shading interp
-title('Shear stress (\sigma_{xx})jiexijie');
+title('Shear stress (\sigma_{xx})解析解');
 xlabel('x - coordinate');
 ylabel('y - coordinate');
 
 colorbar
-
-
-
 
 
 

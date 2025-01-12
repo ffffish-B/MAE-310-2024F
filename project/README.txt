@@ -1,0 +1,6 @@
+driver是第一问（也就是代码开发部分）的代码
+dierwen是无限有孔板的代码
+disanwen是工程问题横向拉伸有限有孔板的代码
+get error是无限有孔板代码的误差
+error lines是无限有孔板多个网格画线的的代码
+tu。。。是gmsh的文件

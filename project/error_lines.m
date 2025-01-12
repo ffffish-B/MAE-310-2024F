@@ -43,16 +43,14 @@ log_L2 = log(errors_L2_whole(:,1));
 coeff_L2 = polyfit(log_h, log_L2, 1);
 
 slope_L2 = coeff_L2(1);
+hold on
+% Add fitted lines
+fit_L2 = exp(polyval(coeff_L2, log_h));
 
-% % Add fitted lines
-% fit_L2 = exp(polyval(coeff_L2, log_h));
-% 
-% loglog(mesh_sizes, fit_L2, '--', 'DisplayName', sprintf('L2 Fit (Slope: %.2f)', slope_L2));
+loglog(mesh_sizes, fit_L2, '--', 'DisplayName', sprintf('L2 Fit (Slope: %.2f)', slope_L2));
 
 xlabel('Mesh Size (h)');
 ylabel('Error');
 legend;
 grid on;
 title('Error Convergence and Fitted Slopes');
-
-slope_L2
