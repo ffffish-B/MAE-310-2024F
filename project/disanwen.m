@@ -203,6 +203,12 @@ for ee = 1 : n_el
                 f_ele(pp+1) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_x * dx_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_x * dx_dxi;
                 f_ele(pp+2) = weight1D(qua) * PolyShape(1, 1, xi1D(qua), 0) * h_y * dx_dxi + weight1D(qua) * PolyShape(1, 2, xi1D(qua), 0) * h_y * dx_dxi;
             end
+            for i = 1 : 2
+                PP = ID(IEN(ee, aa) ,i);
+                if PP > 0
+                    F(PP) = F(PP) + f_ele(2*(aa-1)+i);
+                end
+            end
         end
     end
     for ll = 1 : n_int2D
@@ -262,7 +268,6 @@ for ee = 1 : n_el
         for i = 1 : 2
             PP = ID(IEN(ee, aa) ,i);
             if PP > 0
-                F(PP) = F(PP) + f_ele(2*(aa-1)+i);
                 for bb = 1 : n_en
                     for j = 1 : 2
                         QQ = ID(IEN(ee, bb), j);
@@ -301,26 +306,28 @@ end
 
 
 
-% 
-% figure;
-% hold on;
-% trisurf(IEN_tri, x_coor, y_coor, disp(:,1));
-% axis equal;
-% colormap jet
-% shading interp
-% title('x - direction displacement (d_x)');
-% xlabel('x - coordinate');
-% ylabel('y - coordinate');
-% 
-% figure;
-% hold on;
-% trisurf(IEN_tri, x_coor, y_coor, disp(:,2));
-% axis equal;
-% colormap jet
-% shading interp
-% title('y - direction displacement (d_y)');
-% xlabel('x - coordinate');
-% ylabel('y - coordinate');
+
+figure;
+hold on;
+trisurf(IEN_tri, x_coor, y_coor, disp(:,1));
+axis equal;
+colormap jet
+shading interp
+title('x - direction displacement (d_x)');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+colorbar
+
+figure;
+hold on;
+trisurf(IEN_tri, x_coor, y_coor, disp(:,2));
+axis equal;
+colormap jet
+shading interp
+title('y - direction displacement (d_y)');
+xlabel('x - coordinate');
+ylabel('y - coordinate');
+colorbar
 
 
 
@@ -418,9 +425,6 @@ end
 
 
 
-
-
-
 figure;                     %x方向应力
 hold on
 trisurf(IEN_tri, x_coor, y_coor, node_stress(:, 1));
@@ -430,6 +434,7 @@ shading interp
 title('x - direction stress (\sigma_{xx})');
 xlabel('x - coordinate');
 ylabel('y - coordinate');
+colorbar
 
 % figure;                     %y方向应力
 % hold on
@@ -440,6 +445,7 @@ ylabel('y - coordinate');
 % title('y - direction stress (\sigma_{yy})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
+% colorbar
 
 % figure;                     %xy扭矩
 % hold on
@@ -450,6 +456,7 @@ ylabel('y - coordinate');
 % title('Shear stress (\sigma_{xy})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
+% colorbar
 
 %%%%%%%%%%%%%
 
@@ -462,6 +469,7 @@ ylabel('y - coordinate');
 % title('x - direction strain (\sigma_{xx})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
+% colorbar
 % 
 % figure;                     %y方向应变
 % hold on
@@ -472,6 +480,7 @@ ylabel('y - coordinate');
 % title('y - direction strain (\sigma_{yy})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
+% colorbar
 % 
 % figure;                     %xy扭转
 % hold on
@@ -482,32 +491,7 @@ ylabel('y - coordinate');
 % title('Shear strain (\sigma_{xy})');
 % xlabel('x - coordinate');
 % ylabel('y - coordinate');
-% 
-
-
-node_stress_exact = zeros(n_np,3);
-for ii = 1 : n_np
-    node_stress_exact(ii,1) = xig_xx(x_coor(ii),y_coor(ii));
-    node_stress_exact(ii,2) = xig_yy(x_coor(ii),y_coor(ii));
-    node_stress_exact(ii,3) = xig_xy(x_coor(ii),y_coor(ii));
-end
-
-
-
-
-figure;                     %解析解x方向
-hold on
-trisurf(IEN_tri, x_coor, y_coor, node_stress_exact(:, 1));
-axis equal;
-colormap jet
-shading interp
-title('Shear stress (\sigma_{xx})jiexijie');
-xlabel('x - coordinate');
-ylabel('y - coordinate');
-
-colorbar
-
-
+% colorbar
 
 
 

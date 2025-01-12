@@ -43,6 +43,7 @@ n_en = 4;%局部节点数
 n_np = msh.nbNod;%节点数
 lines = msh.LINES;%线
 
+h = sqrt((L^2-pi*R^2/4)/n_el);
 
 x_coor = pos(:, 1);
 y_coor = pos(:, 2);
@@ -360,6 +361,28 @@ for ii = 1 : n_np
 end
 
 
+% plane strain
+D(1,1) = lambda + 2*miu;
+D(2,2) = D(1,1);
+D(1,2) = lambda;
+D(2,1) = D(1,2);
+D(3,3) = miu;
+
+
+node_strain_exact = zeros(n_np, 3);
+for nn = 1:n_np
+    node_strain_exact(nn, :) = D * node_stress_exact(nn, :)';
+end
+
+
+errors_L2 = zeros(3,1);
+for qq = 1:3
+    error_L2 = 0;
+    for ii = 1 : n_np
+        error_L2 = error_L2 + (node_strain_exact(ii,qq)-node_strain(ii, qq))^2;
+    end
+    errors_L2(qq) = sqrt(error_L2*(L^2)/n_el/n_el);
+end
 
 
 
